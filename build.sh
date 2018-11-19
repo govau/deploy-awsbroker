@@ -20,7 +20,7 @@ go install github.com/awslabs/aws-servicebroker/cmd/servicebroker
 cp  "${ORIG_PWD}/ci/manifest.yml" \
     "${ORIG_PWD}/ci/Procfile" \
     "${ORIG_PWD}/ci/run_app.sh" \
-    "${ORIG_PWD}/ci/ups_as_envs.sh" \
+    "${ORIG_PWD}/ci/ups_as_envs.py" \
     "${ORIG_PWD}/build"
 
 printf "\ndomain: $DOMAIN\n" >> ${ORIG_PWD}/build/manifest.yml
