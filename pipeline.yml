@@ -8,7 +8,7 @@ jobs:
       trigger: true
     - get: src
     - task: build
-      file: src/ci/build.yml
+      file: ci/build.yml
       params:
         DOMAIN: system.g.cld.gov.au
     - put: g-cf

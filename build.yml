@@ -18,4 +18,4 @@ params:
   DOMAIN:
 
 run:
-  path: src/ci/build.sh
+  path: ci/build.sh
