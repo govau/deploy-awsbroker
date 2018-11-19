@@ -1,1 +1,1 @@
-web: ./runbroker.sh
+web: ./run_app.sh
