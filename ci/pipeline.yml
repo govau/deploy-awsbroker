@@ -1,0 +1,58 @@
+---
+jobs:
+- name: awsbroker-g
+  serial: true
+  plan:
+  - do:
+    - get: ci
+      trigger: true
+    - get: src
+    - task: build
+      file: src/ci/build.yml
+      params:
+        DOMAIN: system.g.cld.gov.au
+    - put: g-cf
+      params:
+        manifest: build/manifest.yml
+        path: build
+        current_app_name: awsbroker
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+resources:
+- name: ci
+  type: git
+  source:
+    uri: https://github.com/govau/deploy-awsbroker
+    branch: master
+- name: src
+  type: git
+  source:
+    uri: https://github.com/awslabs/aws-servicebroker
+    branch: master
+- name: g-cf
+  type: cf
+  source:
+    api: https://api.system.g.cld.gov.au
+    username: ci-system-awsbroker
+    password: ((g-password))
+    organization: system
+    space: awsbroker
+- name: slack
+  type: slack-notification
+  source:
+    url: ((slack-webhook-url))
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
