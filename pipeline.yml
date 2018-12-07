@@ -37,8 +37,8 @@ resources:
 - name: src
   type: git
   source:
-    uri: https://github.com/awslabs/aws-servicebroker
-    branch: master
+    uri: https://github.com/govau/aws-servicebroker
+    branch: snakesonaplane
 - name: g-cf
   type: cf
   source:
