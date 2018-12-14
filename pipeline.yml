@@ -5,13 +5,101 @@ jobs:
   plan:
   - do:
     - get: ci
-      trigger: true
     - get: src
     - task: build
       file: ci/build.yml
       params:
         DOMAIN: system.g.cld.gov.au
     - put: g-cf
+      params:
+        manifest: build/manifest.yml
+        path: build
+        current_app_name: awsbroker
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: awsbroker-d
+  serial: true
+  plan:
+  - do:
+    - get: ci
+    - get: src
+    - task: build
+      file: ci/build.yml
+      params:
+        DOMAIN: system.d.cld.gov.au
+    - put: d-cf
+      params:
+        manifest: build/manifest.yml
+        path: build
+        current_app_name: awsbroker
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: awsbroker-y
+  serial: true
+  plan:
+  - do:
+    - get: ci
+      passed:
+      - awsbroker-d
+    - get: src
+      passed:
+      - awsbroker-d
+    - task: build
+      file: ci/build.yml
+      params:
+        DOMAIN: system.y.cld.gov.au
+    - put: y-cf
+      params:
+        manifest: build/manifest.yml
+        path: build
+        current_app_name: awsbroker
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: awsbroker-b
+  serial: true
+  plan:
+  - do:
+    - get: ci
+      passed:
+      - awsbroker-y
+    - get: src
+      passed:
+      - awsbroker-y
+    - task: build
+      file: ci/build.yml
+      params:
+        DOMAIN: system.b.cld.gov.au
+    - put: b-cf
       params:
         manifest: build/manifest.yml
         path: build
@@ -45,6 +133,30 @@ resources:
     api: https://api.system.g.cld.gov.au
     username: ci-system-awsbroker
     password: ((g-password))
+    organization: system
+    space: awsbroker
+- name: d-cf
+  type: cf
+  source:
+    api: https://api.system.d.cld.gov.au
+    username: ci-system-awsbroker
+    password: ((d-password))
+    organization: system
+    space: awsbroker
+- name: y-cf
+  type: cf
+  source:
+    api: https://api.system.y.cld.gov.au
+    username: ci-system-awsbroker
+    password: ((y-password))
+    organization: system
+    space: awsbroker
+- name: b-cf
+  type: cf
+  source:
+    api: https://api.system.b.cld.gov.au
+    username: ci-system-awsbroker
+    password: ((b-password))
     organization: system
     space: awsbroker
 - name: slack
