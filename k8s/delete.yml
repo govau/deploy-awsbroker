@@ -1,0 +1,22 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: govau/cga-cf-bosh-cli
+    tag: latest
+
+inputs:
+- name: ci
+
+outputs: []
+
+params:
+  HELM_PREFIX: ""
+  KUBECONFIG: ((kubeconfig))
+  TILLER_NAMESPACE: aws-sb-ci
+  NAMESPACE:
+
+run:
+  path: ci/k8s/delete.sh

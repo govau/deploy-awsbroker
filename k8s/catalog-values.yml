@@ -1,0 +1,11 @@
+# We are installing this inside a namespace with an rbac restricted service account,
+# so no need for moar rbac.
+rbacEnable: false
+# unable to install aggregator by a service account
+# TODO what does this break?
+useAggregator: false
+apiserver:
+  storage:
+    etcd:
+      useEmbedded: false
+      servers: http://etcd-cluster-client:2379

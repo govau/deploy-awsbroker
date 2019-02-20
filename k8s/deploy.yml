@@ -1,0 +1,24 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: govau/cga-cf-bosh-cli
+    tag: latest
+
+inputs:
+- name: charts
+- name: ci
+- name: service-catalog.release
+
+outputs: []
+
+params:
+  HELM_PREFIX: ""
+  KUBECONFIG: ((kubeconfig))
+  NAMESPACE:
+  TILLER_NAMESPACE: aws-sb-ci
+
+run:
+  path: ci/k8s/deploy.sh
